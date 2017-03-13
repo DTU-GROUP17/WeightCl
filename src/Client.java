@@ -20,13 +20,14 @@ public class Client {
 			data.setMessage("Enter ID");
 			Reply.writeBytes("RM20 8 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
 			Reply.flush();
-			this.flow2(Answer, Reply);			
+			this.flow2(Answer, Reply);
+			}			
 		}
 		
 		//Operator ID typed and save localy
 		public void flow2(BufferedReader Answer, DataOutputStream Reply)throws IOException{
-			data.setInput(Answer.readLine());
-			data.setInput(Answer.readLine());
+			data.setServer(Answer.readLine());
+			data.setServer(Answer.readLine());
 			if(data.getServer().equals("RM20 B")){
 				data.setServer(Answer.readLine());
 				if (!aborted()) {
@@ -49,16 +50,16 @@ public class Client {
 		}
 		
 // Item number reads and saves localy
-		public void sequence4(BufferedReader Answer, DataOutputStream Reply) throws IOException
+		public void flow4(BufferedReader Answer, DataOutputStream Reply) throws IOException
 		{
-			data.setInput(Answer.readLine());
-			data.setInput(data.getInput().split());
+			data.setServer(Answer.readLine());
+			data.setInput(data.getServer().split(" "));
 			// Here we get RM20 B which inholds an Item number
 			//Command separets with help of split and we chose place [2], in this way we end with an Iteam number
 			if(data.getInput().equals("RM20 B")){ 
-				data.setInput(Answer.readLine());
+				data.setServer(Answer.readLine());
 				if(!aborted()){
-					data.setInput(data.getInput().split(" "));
+					data.setInput(data.getServer().split(" "));
 					
 					System.out.println("" + data.getInput());
 					System.out.println("" + data.getInput()[2]);
@@ -114,21 +115,29 @@ public class Client {
 					data.setInput(Answer.readLine());
 //					data.setServerInput(Answer.readLine());
 //					data.setServerInput(Answer.readLine());
+					data.setServer(Answer.readLine());
+
 					
 					data.setInput(data.getInput().split(" "));
 					if(data.getInput().equals("RM20 B"))
+					data.setInput(data.getServer().split(" "));
+					if(data.getServer().equals("RM20 B"))
 					{
 						data.setInput(Answer.readLine());
+						data.setServer(Answer.readLine());
 						if(!aborted()){
 							data.setInput(data.getInput().split(" "));
+							data.setInput(data.getServer().split(" "));
 							data.setUser(data.getInput()[2]);		
 
 							//Hvis varen er korrekt fortsættes der til sekvens 7 ellers starter man forfra i sekvens 3.						
+					
 							if(data.getUser().equals("\"1\""))
 							{
 								this.flow7(Answer, Reply);
 							}
 							//Fejl: Kan annullere, men kan derefter ikke v�lge samme vare igen.
+							
 							else if(data.getUser().equals("\"0\""))
 							{
 								this.flow3(Answer, Reply);
@@ -145,10 +154,13 @@ public class Client {
 			this.flow3(Answer, Reply);
 
 		}
+		
+
+
 
 		boolean aborted() {
 			// TODO Auto-generated method stub
-			return !data.getInput().startsWith("RM20 A");
+			return !data.getServer().startsWith("RM20 A");
 
 		}
 
