@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 
-public class Mian {
+public class Main {
 
 	public static void main(String[] args) throws Exception { 
 		// TODO Auto-generated method stub
