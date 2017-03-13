@@ -10,5 +10,8 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 
 public class Client {
+	
+	Data data = new Data();
+
 
 }
