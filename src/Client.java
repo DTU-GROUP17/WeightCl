@@ -24,9 +24,22 @@ public class Client {
 		}
 		
 		//Operator ID typed and save localy
-		public void flow2(){
-			
+		public void flow2(BufferedReader Answer, DataOutputStream Reply)throws IOException{
+			data.setInput(Answer.readLine());
+			data.setInput(Answer.readLine());
+			if(data.getServer().equals("RM20 B")){
+				data.setServer(Answer.readLine());
+				if (!aborted()) {
+					data.setInput(data.getServer().split(" "));
+					data.setOpratorID(data.getInput()[2]); // Should be check
+					this.flow3(Answer, Reply);
+				}
+				else
+					this.flow1(Answer, Reply);
+			}
 		}
+		
+
 
 
 	}
