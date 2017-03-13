@@ -155,6 +155,27 @@ public class Client {
 
 		}
 		
+		//Display asks about tara and a user confirm.
+				public void flow7(BufferedReader Answer, DataOutputStream Reply) throws IOException
+				{
+					data.setMessage("Place the bowl");
+					Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+					data.setServer(Answer.readLine());
+
+					if(data.getInput().equals("RM20 B"))
+						data.setServer(Answer.readLine());
+					else
+						this.flow7(Answer, Reply);
+
+					if(!aborted())
+						this.flow8(Answer, Reply);
+					else
+						this.flow1(Answer, Reply);
+
+				}
+				
+
 
 
 
