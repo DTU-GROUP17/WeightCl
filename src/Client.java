@@ -112,21 +112,21 @@ public class Client {
 					
 					Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
 
-					data.setInput(Answer.readLine());
+					data.setServer(Answer.readLine());
 //					data.setServerInput(Answer.readLine());
 //					data.setServerInput(Answer.readLine());
 					data.setServer(Answer.readLine());
 
 					
-					data.setInput(data.getInput().split(" "));
+					data.setInput(data.getServer().split(" "));
 					if(data.getInput().equals("RM20 B"))
 					data.setInput(data.getServer().split(" "));
 					if(data.getServer().equals("RM20 B"))
 					{
-						data.setInput(Answer.readLine());
+						data.setServer(Answer.readLine());
 						data.setServer(Answer.readLine());
 						if(!aborted()){
-							data.setInput(data.getInput().split(" "));
+							data.setInput(data.getServer().split(" "));
 							data.setInput(data.getServer().split(" "));
 							data.setUser(data.getInput()[2]);		
 
@@ -208,7 +208,124 @@ public class Client {
 						this.flow10(Answer, Reply);
 				}
 				
+				// Netto registering
+				public void flow10(BufferedReader Answer, DataOutputStream Reply) throws IOException{
 
+					Reply.writeBytes("S\r\n");
+
+					data.setServer(Answer.readLine());
+					if(data.getServer().startsWith("S S")){
+						data.setInput(data.getServer().split(" +"));
+						data.setNetto(Double.parseDouble(data.getInput()[2])-data.getTara());
+						this.flow11(Answer, Reply);
+					}
+					else this.flow9(Answer, Reply);
+				}
+				
+				// 11- The operator is instructed to remove the net and tare.
+				public void flow11(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+					data.setMessage("Remove devices");
+					Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+					data.setServer(Answer.readLine());
+
+
+					if(data.getServer().equals("RM20 B"))
+						data.setServer(Answer.readLine());
+
+					else
+						this.flow11(Answer, Reply);
+
+
+					if(!aborted())
+						this.flow12(Answer, Reply);
+					else
+						this.flow1(Answer, Reply);
+				}
+				
+		//12- Weight tare, so it is ready for a new lap
+				public void flow12(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+
+					Reply.writeBytes("T\r\n");
+					this.flow13(Answer, Reply);
+				}
+		// Minus brutto register
+				public void flow13(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+
+					data.setServer(Answer.readLine());
+					if(data.getServer().startsWith("T S")){
+						data.setInput(data.getServer().split(" +"));
+						data.setBruttoCheck(Double.parseDouble(data.getInput()[2]));
+						this.flow13(Answer, Reply);
+					}
+					else this.flow14(Answer, Reply);
+				}
+				
+				// 14- Gross Control OK if this is the case.
+				public void flow14(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+					if(data.getBruttoCheck() >= 2 || data.getBruttoCheck() <= -2){
+
+						data.setMessage("balancing rejected");
+						Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+						data.setServer(Answer.readLine());
+
+						if(data.getServer().equals("RM20 B"))
+							data.setServer(Answer.readLine());
+						else
+							this.flow14(Answer, Reply);
+
+						if(data.getServer().startsWith("RM20 A"))
+							this.flow7(Answer, Reply);
+					}
+					else{
+
+						data.setMessage("Balancing approved!");
+
+						Reply.writeBytes("RM20 4 \""+ data.getMessage() +"\"\r\n");
+						Answer.readLine();
+						Answer.readLine();
+						this.flow15(Answer, Reply);
+					}
+				}
+				
+				// 15- Quantity in stock depreciated and history updated.
+				public void flow15(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+
+					try{
+						log();
+					}
+					catch(FileNotFoundException e){
+						data.setMessage("Logfejl. Afvist!");
+						Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+						data.setServer(Answer.readLine());
+
+						if(data.getServer().equals("RM20 B"))
+							data.setServer(Answer.readLine());
+						else
+							this.flow15(Answer, Reply);
+
+						if(data.getServer().startsWith("RM20 A"))
+							this.flow1(Answer, Reply);
+					}
+
+
+					this.flow1(Answer, Reply);
+				}
+
+				public void log() throws IOException{
+
+					BufferedWriter bw = new BufferedWriter(new FileWriter(new File("Log.txt"), true));
+					Calendar c = Calendar.getInstance();
+					DecimalFormat df = new DecimalFormat("00");
+					String timeStamp = "" + c.get(Calendar.YEAR) + "-" + df.format(c.get(Calendar.MONTH) + 1) + "-" + df.format(c.get(Calendar.DATE)) + "-" + df.format(c.get(Calendar.HOUR_OF_DAY)) + ":" + df.format(c.get(Calendar.MINUTE)) + ":" + df.format(c.get(Calendar.SECOND));
+
+					bw.write(timeStamp + ", " + data.getOpratorID() + ", " + data.getItemNoInput() + ", " + data.getItemName() + ", " + data.getNetto() + " kg.");
+					bw.newLine();
+					bw.flush();
+					bw.close();
+				}
 
 
 
