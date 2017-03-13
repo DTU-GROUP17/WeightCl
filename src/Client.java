@@ -39,7 +39,15 @@ public class Client {
 			}
 		}
 		
-
+		//Weight simulator asks about Item number
+		public void flow3(BufferedReader Answer, DataOutputStream Reply) throws IOException
+		{
+			//Sekvens 3 kunne kombineres med sekvens 4.
+			data.setMessage("Type Itemm number");
+			Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+			this.flow4(Answer, Reply);
+		}
+		
 
 
 	}
