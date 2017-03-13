@@ -48,6 +48,34 @@ public class Client {
 			this.flow4(Answer, Reply);
 		}
 		
+// Item number reads and saves localy
+		public void sequence4(BufferedReader Answer, DataOutputStream Reply) throws IOException
+		{
+			data.setInput(Answer.readLine());
+			data.setInput(data.getInput().split());
+			// Here we get RM20 B which inholds an Item number
+			//Command separets with help of split and we chose place [2], in this way we end with an Iteam number
+			if(data.getInput().equals("RM20 B")){ 
+				data.setInput(Answer.readLine());
+				if(!aborted()){
+					data.setInput(data.getInput().split(" "));
+					
+					System.out.println("" + data.getInput());
+					System.out.println("" + data.getInput()[2]);
+					
+					String temp;
+					temp = data.getInput()[2].replaceAll("\"","");
+					System.out.println(temp);
+					
+					data.setItemNoInput(Integer.parseInt(temp));
+					this.flow5_6(Answer, Reply);
+				}
+				else
+					this.flow1(Answer, Reply);
+			}
+		}
+		
+
 
 
 	}
