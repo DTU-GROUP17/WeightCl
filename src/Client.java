@@ -175,6 +175,39 @@ public class Client {
 
 				}
 				
+				//Wieght tares and tara saves localy
+				public void flow8(BufferedReader Answer, DataOutputStream Reply) throws IOException
+				{
+					Reply.writeBytes("T\r\n");
+
+					data.setServer(Answer.readLine());
+					if(data.getServer().startsWith("T S")){
+						data.setInput(data.getServer().split(" +"));
+						data.setTara(Double.parseDouble(data.getInput()[2]));
+						this.flow9(Answer, Reply);
+					}
+					else this.flow7(Answer, Reply);
+				}
+				
+				//The operator is instructed to fill item, and then press enter.
+
+				public void flow9(BufferedReader Answer, DataOutputStream Reply) throws IOException{
+					data.setMessage("Fill item");
+					Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+					data.setServer(Answer.readLine());
+
+					if(data.getServer().equals("RM20 B"))
+						data.setServer(Answer.readLine());
+					else
+						this.flow9(Answer, Reply);
+
+					if(!aborted())
+						this.flow10(Answer, Reply);
+					else
+						this.flow10(Answer, Reply);
+				}
+				
 
 
 
