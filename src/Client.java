@@ -76,6 +76,81 @@ public class Client {
 		}
 		
 
+		
+		/* 5- Compare and check userinput and Item number
+		 * 6- When the Item number has foun, program will ask the user 
+		 * about the correctness of the Iteam name.
+		 */
+
+		public void flow5_6(BufferedReader Answer, DataOutputStream Reply) throws IOException
+		{
+
+			BufferedReader localAnswer = new BufferedReader(new FileReader(new File("shop.txt")));
+
+			boolean notFound = true;
+
+			while(notFound){
+				try{
+					data.setInput(localAnswer.readLine().split(","));
+				}
+				catch(NullPointerException e){
+					notFound = true;
+				}
+				data.setItemNoStore(Integer.parseInt(data.getInput()[0]));
+				System.out.println("store: " + data.getItemNoStore());
+				System.out.println("input: " + data.getItemNoInput() + "\n");
+				
+				if(data.getItemNoStore() == data.getItemNoInput()){ 
+					localAnswer.close();
+					//Så snart at det indtastede nummer er lig et nummer i "databasen", 
+					// sættes notFound = false og nedenstående kode eksekveres. 
+					notFound = false;
+					data.setItemName(data.getInput()[1]);
+		
+					data.setMessage("Item: " + data.getItemName()); 
+					
+					Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+
+					data.setInput(Answer.readLine());
+//					data.setServerInput(Answer.readLine());
+//					data.setServerInput(Answer.readLine());
+					
+					data.setInput(data.getInput().split(" "));
+					if(data.getInput().equals("RM20 B"))
+					{
+						data.setInput(Answer.readLine());
+						if(!aborted()){
+							data.setInput(data.getInput().split(" "));
+							data.setUser(data.getInput()[2]);		
+
+							//Hvis varen er korrekt fortsættes der til sekvens 7 ellers starter man forfra i sekvens 3.						
+							if(data.getUser().equals("\"1\""))
+							{
+								this.flow7(Answer, Reply);
+							}
+							//Fejl: Kan annullere, men kan derefter ikke v�lge samme vare igen.
+							else if(data.getUser().equals("\"0\""))
+							{
+								this.flow3(Answer, Reply);
+							}
+						}
+						else
+							this.flow1(Answer, Reply);
+					}
+				}
+			}
+			data.setMessage("Item number not found");
+			Reply.writeBytes("RM20 4 \"" + data.getMessage() + "\" \" \" \"&3\"\r\n");
+			Answer.readLine();
+			this.flow3(Answer, Reply);
+
+		}
+
+		boolean aborted() {
+			// TODO Auto-generated method stub
+			return !data.getInput().startsWith("RM20 A");
+
+		}
 
 
 	}
