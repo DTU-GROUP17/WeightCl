@@ -11,7 +11,7 @@ public class Main {
 		
 		// IP should change with your current IP
 		Client f = new Client();
-		Socket clientSocket = new Socket("IP", 8000);
+		Socket clientSocket = new Socket("169.254.2.3", 8000);
 		
 		DataOutputStream Reply = 
 				new DataOutputStream(clientSocket.getOutputStream());
